@@ -6,7 +6,10 @@ Requirements: python 3, openpyxl, SANS.xlsx (SANS database report), ActiveEE (JS
 In order to do a demo of the script:
 
 Must have python version 3 or greater
+
 Download all files and keep them in the same directory
+
 Install openpyxl by running 'pip install openpyxl' in the command prompt or console.
+
 See documentation for openpyxl here: https://openpyxl.readthedocs.io/en/stable/index.html
 
