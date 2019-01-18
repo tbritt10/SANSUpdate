@@ -9,7 +9,7 @@ def loadSANS():
         #List to store emails from wb
         emails = []
         print("Processing data from SANS.xlsx")
-        for row in range(2,ws.max_row+1):
+        for row in range(3,ws.max_row+1):
             for column in "A":
                 #Grabbing cell reference
                 cell_name = "{}{}".format(column, row)
@@ -17,6 +17,42 @@ def loadSANS():
                 emails.append(ws[cell_name].value)
         print("Loaded emails from SANS.xlsx\n")
         return(emails)
+
+def loadSANSNames():
+    wb = load_workbook('SANS.xlsx')
+    ws = wb.active
+    #return list
+    sansNames = []
+    #Temporary string to split first and last names
+    toSplit = ""
+    print("Parsing names from SANS.xlsx")
+    for row in range(3,ws.max_row+1):
+        for column in "B":
+            cell_name = "{}{}".format(column, row)
+            toSplit = ws[cell_name].value
+            sansNames.append(toSplit.split())
+    print("Loaded names from SANS.xlsx")
+    for name in range(len(sansNames)):
+        print(sansNames[name])
+
+def loadActiveNames():
+    wb = load_workbook('ActiveEE.xlsx')
+    ws = wb.active
+    #return list
+    activeNames = []
+    #Temporary string to split first and last names
+    toSplit = ""
+    print("Parsing names from ActiveEE.xlsx")
+    for row in range(2,ws.max_row+1):
+        for column in "A":
+            cell_name = "{}{}".format(column, row)
+            toSplit = ws[cell_name].value
+            #Need to strip comma and one space - not currently working
+            toSplit.strip(' ,')
+            activeNames.append(toSplit.split())
+    print("Loaded names from ActiveEE.xlsx")
+    for name in range(len(activeNames)):
+        print(activeNames[name])
 
 def loadActive():
 
@@ -103,4 +139,6 @@ def exportData():
     print("updated.xlsx saved")
 def main():
     exportData()
+    #loadSANSNames()
+    #loadActiveNames()
 main()
