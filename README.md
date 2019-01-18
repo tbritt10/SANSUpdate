@@ -11,5 +11,7 @@ Download all files and keep them in the same directory
 
 Install openpyxl by running 'pip install openpyxl' in the command prompt or console.
 
+Remove 'fake' from the names of the excel files. (Excel doesn't allow me to have two files of the same name regardless of directory.)
+
 See documentation for openpyxl here: https://openpyxl.readthedocs.io/en/stable/index.html
 
