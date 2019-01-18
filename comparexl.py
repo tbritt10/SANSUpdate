@@ -19,6 +19,7 @@ def loadSANS():
         return(emails)
 
 def loadSANSNames():
+    #Currently loads all names in file for testing but will have to implemented into loadSANS() later
     wb = load_workbook('SANS.xlsx')
     ws = wb.active
     #return list
@@ -36,19 +37,22 @@ def loadSANSNames():
         print(sansNames[name])
 
 def loadActiveNames():
+    #This currently loads all names for quick testing, but in the future will have to be implemented
+    # with loadActiveNames()
     wb = load_workbook('ActiveEE.xlsx')
     ws = wb.active
     #return list
     activeNames = []
     #Temporary string to split first and last names
+    tempString = ""
     toSplit = ""
     print("Parsing names from ActiveEE.xlsx")
     for row in range(2,ws.max_row+1):
         for column in "A":
             cell_name = "{}{}".format(column, row)
-            toSplit = ws[cell_name].value
+            tempString = ws[cell_name].value
             #Need to strip comma and one space - not currently working
-            toSplit.strip(' ,')
+            toSplit = tempString.replace(' ,', '')
             activeNames.append(toSplit.split())
     print("Loaded names from ActiveEE.xlsx")
     for name in range(len(activeNames)):
@@ -138,7 +142,7 @@ def exportData():
     wb.save('updated.xlsx')
     print("updated.xlsx saved")
 def main():
-    exportData()
+    #exportData()
     #loadSANSNames()
-    #loadActiveNames()
+    loadActiveNames()
 main()
