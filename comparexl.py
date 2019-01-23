@@ -2,66 +2,109 @@ from openpyxl import load_workbook
 from openpyxl import Workbook
 import openpyxl
 
+#Global strings for file names
+sans = "Report1548267424539.xlsx"
+active = "ActiveEE.xlsx"
+
 def loadSANS():
     #Workbook and worksheet to pull data from
-        wb = load_workbook('SANS.xlsx', data_only=True)
+        wb = load_workbook(sans, data_only=True)
         ws = wb.active
         #List to store emails from wb
         emails = []
-        print("Processing data from SANS.xlsx")
+        print("Processing data from Report1548267424539.xlsx")
         for row in range(3,ws.max_row+1):
-            for column in "A":
+            for column in "E":
                 #Grabbing cell reference
                 cell_name = "{}{}".format(column, row)
                 #Adding the cell reference.value to list
                 emails.append(ws[cell_name].value)
-        print("Loaded emails from SANS.xlsx\n")
+        print("Loaded emails from Report1548267424539.xlsx\n")
         return(emails)
 
 def loadSANSNames():
-    #Currently loads all names in file for testing but will have to implemented into loadSANS() later
-    wb = load_workbook('SANS.xlsx')
+    wb = load_workbook(sans)
     ws = wb.active
     #return list
     sansNames = []
     #Temporary string to split first and last names
     toSplit = ""
-    print("Parsing names from SANS.xlsx")
+    print("Parsing names from Report1548267424539.xlsx")
     for row in range(3,ws.max_row+1):
         for column in "B":
             cell_name = "{}{}".format(column, row)
             toSplit = ws[cell_name].value
             sansNames.append(toSplit.split())
-    print("Loaded names from SANS.xlsx")
-    for name in range(len(sansNames)):
-        print(sansNames[name])
+    print("Loaded names from Report1548267424539.xlsx")
+    return sansNames
+def loadSANSEmployeeNums():
+    wb = load_workbook(sans)
+    ws = wb.active
+    #return list
+    sansEmpNum = []
+    print("Parsing employee numbers from Report1548267424539.xlsx")
+    for row in range(3,ws.max_row+1):
+        for column in "A":
+            cell_name = "{}{}".format(column, row)
+            sansEmpNum.append(ws[cell_name].value)
+    print("Succesfully loaded employee numbers from Report1548267424539.xlsx")
+
+def findInactiveNames():
+    sansNames = loadSANSNames()
+    activeNames = loadActiveNames()
+
+    inactiveNames = []
+
+    # Find inactive users
+    for i in range(len(sansNames)):
+        try:
+            activeNames.index(sansNames[i])
+        except ValueError:
+            inactiveNames.append(sansNames[i])
+
+    print("Finished searching for inactive users names\n")
+    return (inactiveNames)
+
+def findActiveNames():
+    sansNames = loadSANSNames()
+    activeNames = loadActiveNames()
+
+    newActiveNames = []
+
+    # Find inactive users
+    for i in range(len(activeNames)):
+        try:
+            sansNames.index(activeNames[i])
+        except ValueError:
+            newActiveNames.append(activeNames[i])
+
+    print("Finished searching for active users names\n")
+    return (newActiveNames)
 
 def loadActiveNames():
-    #This currently loads all names for quick testing, but in the future will have to be implemented
-    # with loadActiveNames()
-    wb = load_workbook('ActiveEE.xlsx')
+    wb = load_workbook(active)
     ws = wb.active
     #return list
     activeNames = []
     #Temporary string to split first and last names
-    tempString = ""
     toSplit = ""
     print("Parsing names from ActiveEE.xlsx")
     for row in range(2,ws.max_row+1):
         for column in "A":
             cell_name = "{}{}".format(column, row)
-            tempString = ws[cell_name].value
+            toSplit = ws[cell_name].value
             #Need to strip comma and one space - not currently working
-            toSplit = tempString.replace(' ,', '')
+            toSplit.strip(' ,')
             activeNames.append(toSplit.split())
     print("Loaded names from ActiveEE.xlsx")
     for name in range(len(activeNames)):
         print(activeNames[name])
+    return activeNames
 
 def loadActive():
 
         #Workbook and worksheet to pull data from
-        wb = load_workbook('ActiveEE.xlsx', data_only=True)
+        wb = load_workbook(active, data_only=True)
         ws = wb.active
         #List to store emails from wb
         activeEmails = []
@@ -79,7 +122,7 @@ def loadActive():
 
 def findInactive():
     #Pulls list data from other functions and compares the data to find
-    #Inactive and new users, creating two different lists
+    #Inactive and new users, creating a new list
     print("Searching for inactive users\n")
     listSANS = loadSANS()
     listActive = loadActive()
@@ -137,12 +180,40 @@ def exportData():
     print("Attempting to write new users to file")
     for x in range(len(listNew)):
         ws.cell(row=i, column = 4).value = listNew[x]
+        ws.cell(row=i, column = 7).value = "YES"
+        ws.cell(row=i, column = 8).value = "YES"
         i+=1
+
+    print("Writing names to file...")
+    #Pull names; Compare the lists and create 2 new lists (still nested) from the two. Use .zip(*) to seperate first and last names then write to file.
+    #for i in range(len(listActive)):
+        #try:
+            #listSANS.index(listActive[i])
+        #except ValueError:
+            #listNew.append(listActive[i])
+    #for x in range(len(inactiveFNames)):
+        #ws.cell(row=j, column = 3).value = inactiveFNames[x]
+        #ws.cell(row=j, column = 2).value = inactiveLNames[x]
+    #for x in range(len(activeFNames)):
+        #ws.cell(row=j, column = 3).value = activeFNames[x]
+        #ws.cell(row=j, column = 2).value = activeLNames[x]
+
+    #Write employee numbers to file
+    print("Writing employee numbers to file")
+    #sansNums = loadSANSEmployeeNums()
+    #activeNums = loadActiveEmployeeNums()
+
+    #for i in range(len(listActive)):
+        #try:
+            #listSANS.index(listActive[i])
+        #except ValueError:
+            #listNew.append(listActive[i])
+
     print("Saving file...")
     wb.save('updated.xlsx')
     print("updated.xlsx saved")
 def main():
-    #exportData()
+    exportData()
     #loadSANSNames()
-    loadActiveNames()
+    #loadActiveNames()
 main()
