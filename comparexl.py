@@ -6,6 +6,44 @@ import openpyxl
 sans = "Report1548267424539.xlsx"
 active = "ActiveEE.xlsx"
 
+class ActiveRow:
+    """Row class represents 4 Cells from each row in an excel sheet"""
+
+    def __init__(self,email, fname, lname, empnum):
+        """Create a ActiveRow containing cells from the given row"""
+        self.email = email
+        self.fname = fname
+        self.lname = lname
+        self.empnum = empnum
+
+    def returnEmail(self):
+        """Pull the email from a row, returns a string"""
+        return self.email
+
+    def returnFName(self):
+        """Pull the first name from a row, returns a string"""
+        return self.fname
+
+    def returnLName(self):
+        """Pull the last name string from a row, returns a string"""
+        return self.lname
+
+    def returnEmpNum(self):
+        """Pulls the employee number from a row, returns an int"""
+        return self.empnum
+
+    def toString(self):
+        return "{}".format(self.email)
+
+    def compareRow(self, row):
+        """Compare the email string between two rows, returns a Boolean value"""
+        self.row = row
+        email = self.email
+        email2 = row.returnEmail
+        if (email == email2):
+            return True
+        else:
+            return False
 
 ##SANS Functions##
 def loadSANS():
@@ -13,199 +51,40 @@ def loadSANS():
     wb = load_workbook(sans, data_only=True)
     ws = wb.active
     #List to store emails from wb
-    emails = []
-    print("Processing data from Report1548267424539.xlsx")
+    sansRows = []
+    print("Loading data from " + sans)
     for row in range(3,ws.max_row+1):
-        for column in "E":
-            #Grabbing cell reference
-            cell_name = "{}{}".format(column, row)
-            tempString = str(ws[cell_name].value).strip().lower()
-            #Adding the cell reference.value to list
-            emails.append(tempString)
-    print("Loaded emails from Report1548267424539.xlsx\n")
-    return(emails)
-
-def loadSANSFNames():
-    wb = load_workbook(sans)
-    ws = wb.active
-    #return list
-    sansFNames = []
-    #Temporary string to split first and last names
-    toSplit = ""
-    print("Parsing names from Report1548267424539.xlsx")
-    for row in range(3,ws.max_row+1):
-        for column in "C":
-            cell_name = "{}{}".format(column, row)
-            tempString = str(ws[cell_name].value).strip().lower()
-            sansFNames.append(tempString)
-    print("Loaded names from Report1548267424539.xlsx")
-    return sansFNames
-
-def loadSANSLNames():
-    wb = load_workbook(sans)
-    ws = wb.active
-    sansLNames = []
-
-    for row in range(3, ws.max_row+1):
-        for column in "B":
-            cell_name = "{}{}".format(column, row)
-            tempString = str(ws[cell_name].value).strip().lower()
-            sansLNames.append(tempString)
-    return sansLNames
-
-def loadSANSEmployeeNums():
-    wb = load_workbook(sans)
-    ws = wb.active
-    #return list
-    sansEmpNum = []
-    print("Parsing employee numbers from Report1548267424539.xlsx")
-    for row in range(3,ws.max_row+1):
-        for column in "A":
-            cell_name = "{}{}".format(column, row)
-            sansEmpNum.append(ws[cell_name].value)
-    print("Succesfully loaded employee numbers from Report1548267424539.xlsx")
-    return sansEmpNum
+        formEmail = "{}{}".format("E", row)
+        formFName = "{}{}".format("C", row)
+        formLName = "{}{}".format("B", row)
+        formEmpNum = "{}{}".format("A", row)
+        temprows = ActiveRow(ws[formEmail].value, ws[formFName].value, ws[formLName].value, ws[formEmpNum].value)
+        #Adding the cell reference.value to list
+        sansRows.append(temprows)
+    print("Loaded data from Report1548267424539.xlsx\n")
+    return sansRows
 
 ##ActiveEE Functions##
-
-def loadActiveFNames():
-    wb = load_workbook(active)
-    ws = wb.active
-    activeFNames = []
-
-    print("Parsing names from ActiveEE.xlsx")
-    for row in range(2,ws.max_row+1):
-        for column in "A":
-            cell_name = "{}{}".format(column, row)
-            tempString = str(ws[cell_name].value).strip().lower()
-            activeFNames.append(tempString)
-    print("Loaded names from ActiveEE.xlsx")
-    return activeFNames
-
-def loadActiveLNames():
-    wb = load_workbook(active)
-    ws = wb.active
-    activeLNames = []
-
-    for row in range(2,ws.max_row+1):
-        for column in "B":
-            cell_name = "{}{}".format(column, row)
-            tempString = str(ws[cell_name].value).strip().lower()
-            activeLNames.append(tempString)
-    return activeLNames
-
-def loadActiveEmpNum():
-    #Employee numbers must be 9 characters long with 0's added at the beginning
-    wb = load_workbook(active)
-    ws = wb.active
-    tempString =""
-    activeEmpNums = []
-
-    for row in range(2, ws.max_row+1):
-        for column in "C":
-            cell_name = "{}{}".format(column, row)
-            tempString = str(ws[cell_name].value)
-            tempString.zfill(9)
-            activeEmpNums.append(tempString)
-    return activeEmpNums
 
 def loadActive():
     #Loads emails
     #Workbook and worksheet to pull data from
     wb = load_workbook(active, data_only=True)
     ws = wb.active
-    tempString = ""
-    #List to store emails from wb
-    activeEmails = []
-
-    #Looping through column B in ActiveEE.xlsx
-    print("Processing data from activeEE.xlsx...")
+    activeRows = []
+    print("Loading data from " + active)
     for row in range(2,ws.max_row+1):
-        for column in "D":
-            #Grabbing cell reference
-            cell_name = "{}{}".format(column, row)
-            tempString = str(ws[cell_name].value).strip().lower()
-            #Adding the cell reference.value list
-            activeEmails.append(tempString)
+        formEmail = "{}{}".format("D", row)
+        formFName = "{}{}".format("A", row)
+        formLName = "{}{}".format("B", row)
+        formEmpNum = "{}{}".format("C", row)
+        temprows = ActiveRow(ws[formEmail].value, ws[formFName].value, ws[formLName].value, ws[formEmpNum].value)
+        #Adding the cell reference.value to list
+        activeRows.append(temprows)
     print("Loaded emails from activeEE.xlsx\n")
-    return(activeEmails)
+    return(activeRows)
 
 ##Data Functions
-def findNewFNames():
-    sansFNames = loadSANSFNames()
-    activeFNames = loadActiveFNames()
-
-    newActiveFNames = []
-
-    # Find inactive users
-    for i in range(len(activeFNames)):
-        try:
-            sansFNames.index(activeFNames[i])
-        except ValueError:
-            newActiveFNames.append(activeFNames[i])
-
-    print("Finished searching for active users names\n")
-    return (newActiveFNames)
-
-def findNewLNames():
-    sansLNames = loadSANSLNames()
-    activeLNames = loadActiveLNames()
-    newActiveLNames = []
-
-    for i in range(len(activeLNames)):
-        try:
-            sansLNames.index(activeLNames[i])
-        except ValueError:
-            newActiveLNames.append(activeLNames[i])
-    return newActiveLNames
-
-def findInactiveFNames():
-    sansFNames = loadSANSFNames()
-    activeFNames = loadActiveFNames()
-    newInactiveFNames = []
-
-    for i in range(len(sansFNames)):
-        try:
-            activeFNames.index(sansFNames[i])
-        except ValueError:
-            newInactiveFNames.append(sansFNames[i])
-    return newInactiveFNames
-
-def findInactiveLNames():
-    sansLNames = loadSANSLNames()
-    activeLNames = loadActiveLNames()
-    newInactiveLNames = []
-
-    for i in range(len(sansLNames)):
-        try:
-            activeLNames.index(sansLNames[i])
-        except ValueError:
-            newInactiveLNames.append(sansLNames[i])
-    return newInactiveLNames
-
-def findNewEmpNum():
-    sansEmpNum = loadSANSEmployeeNums()
-    activeEmpNum = loadActiveEmpNum()
-    newEmpNum = []
-
-    for i in range(len(activeEmpNum)):
-        try:
-            sansEmpNum.index(activeEmpNum[i])
-        except ValueError:
-            newEmpNum.append(activeEmpNum[i])
-    return newEmpNum
-
-def findInactiveEmpNum():
-    sansEmpNum = loadSANSEmployeeNums()
-    activeEmpNum = loadActiveEmpNum()
-    inactiveEmpNum = []
-
-    for i in range(len(sansEmpNum)):
-        try:
-            activeEmpNum.index(sansEmpNum[i])
-        except ValueError:
-            inactiveEmpNum.append(sansEmpNum[i])
-    return inactiveEmpNum
 
 def findInactiveEmails():
     #Pulls list data from other functions and compares the data to find
@@ -213,44 +92,55 @@ def findInactiveEmails():
     print("Searching for inactive users\n")
     listSANS = loadSANS()
     listActive = loadActive()
+    convertedSANS = []
+    convertedActive = []
     listInactive = []
 
     #Find inactive users
+    #Convert lists of objects to list of emails
     for i in range(len(listSANS)):
+        convertedSANS.append(listSANS[i].returnEmail())
+
+    for i in range(len(listActive)):
+        convertedActive.append(listActive[i].returnEmail())
+
+    for i in range(len(convertedSANS)):
         try:
-            listActive.index(listSANS[i])
+            convertedActive.index(convertedSANS[i])
         except ValueError:
             listInactive.append(listSANS[i])
 
     print("Finished searching\n")
+    print(str(len(listInactive)))
     return(listInactive)
 
 def findNewEmails():
     print("Searching for new users\n")
     listSANS = loadSANS()
     listActive = loadActive()
+    convertedSANS = []
+    convertedActive = []
     listNew = []
 
+    for i in range(len(listSANS)):
+        convertedSANS.append(listSANS[i].returnEmail())
+
     for i in range(len(listActive)):
+        convertedActive.append(listActive[i].returnEmail())
+
+    for i in range(len(convertedActive)):
         try:
-            listSANS.index(listActive[i])
+            convertedSANS.index(convertedActive[i])
         except ValueError:
             listNew.append(listActive[i])
 
     print("Finished searching\n")
+    print(str(len(listNew)))
     return(listNew)
 
 def exportData():
-    listInactiveEmails = findInactiveEmails()
-    listNewEmails = findNewEmails()
-    inactiveFNames = findInactiveFNames()
-    inactiveLNames = findInactiveLNames()
-    newFNames = findNewFNames()
-    newLNames = findNewLNames()
-    newEmpNums = findNewEmpNum()
-    inactiveEmpNums = findInactiveEmpNum()
-
-    print(str(len(listInactiveEmails)) + "\n" + str(len(listNewEmails)) + "\n" + str(len(inactiveFNames)) +"\n"+ str(len(inactiveLNames)) +"\n"+ str(len(newFNames)) +"\n"+ str(len(newLNames)) +"\n"+ str(len(newEmpNums)) +"\n"+ str(len(inactiveEmpNums)))
+    inactiveEmails = findInactiveEmails()
+    newEmails = findNewEmails()
 
     i = 2
     print("Attempting to open output file")
@@ -265,29 +155,30 @@ def exportData():
         exit()
     #Put Inactive users into file
     print("Attempting to write inactive users to file")
-    for x in range(len(listInactiveEmails)):
-        ws.cell(row=i, column = 4).value = listInactiveEmails[x]
+    for x in range(len(inactiveEmails)):
+        ws.cell(row=i, column = 4).value = inactiveEmails[x].returnEmail()
         ws.cell(row=i, column = 7).value = "NO"
         ws.cell(row=i, column = 8).value = "NO"
-        ws.cell(row=i, column = 3).value = inactiveFNames[x]
-        ws.cell(row=i, column = 2).value = inactiveLNames[x]
-        ws.cell(row=i, column = 1).value = inactiveEmpNums[x]
+        ws.cell(row=i, column = 3).value = inactiveEmails[x].returnFName()
+        ws.cell(row=i, column = 2).value = inactiveEmails[x].returnLName()
+        ws.cell(row=i, column = 1).value = inactiveEmails[x].returnEmpNum()
         i+=1
-    print("Write succesful\n")
+    print("Write successful\n")
 
     print("Attempting to write new users to file")
-    for x in range(len(listNewEmails)):
-        ws.cell(row=i, column = 4).value = listNewEmails[x]
+    for x in range(len(newEmails)):
+        ws.cell(row=i, column = 4).value = newEmails[x].returnEmail()
         ws.cell(row=i, column = 7).value = "YES"
         ws.cell(row=i, column = 8).value = "YES"
-        ws.cell(row=i, column = 3).value = newFNames[x]
-        ws.cell(row=i, column = 2).value = newLNames[x]
-        ws.cell(row=i, column = 1).value = newEmpNums[x]
+        ws.cell(row=i, column = 3).value = newEmails[x].returnFName()
+        ws.cell(row=i, column = 2).value = newEmails[x].returnLName()
+        ws.cell(row=i, column = 1).value = newEmails[x].returnEmpNum()
         i+=1
-
+    print("Write successful")
     print("Saving file...")
     wb.save('updated.xlsx')
     print("updated.xlsx saved")
+
 def main():
     exportData()
 main()
