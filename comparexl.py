@@ -5,6 +5,18 @@ import openpyxl
 #Global strings for file names
 sans = "Report1548267424539.xlsx"
 active = "ActiveEE.xlsx"
+report = "Employees.xlsx"
+
+#Global variables for columns
+sansEmail = "E"
+sansFName = "C"
+sansLName = "B"
+sansEmpNum = "A"
+
+activeEmail = "D"
+activeFName = "A"
+activeLName = "B"
+activeEmpNum = "C"
 
 class ActiveRow:
     """Row class represents 4 Cells from each row in an excel sheet"""
@@ -14,7 +26,7 @@ class ActiveRow:
         self.email = email
         self.fname = fname
         self.lname = lname
-        self.empnum = empnum
+        self.empnum = str(empnum).zfill(9)
 
     def returnEmail(self):
         """Pull the email from a row, returns a string"""
@@ -54,14 +66,14 @@ def loadSANS():
     sansRows = []
     print("Loading data from " + sans)
     for row in range(3,ws.max_row+1):
-        formEmail = "{}{}".format("E", row)
-        formFName = "{}{}".format("C", row)
-        formLName = "{}{}".format("B", row)
-        formEmpNum = "{}{}".format("A", row)
+        formEmail = "{}{}".format(sansEmail, row)
+        formFName = "{}{}".format(sansFName, row)
+        formLName = "{}{}".format(sansLName, row)
+        formEmpNum = "{}{}".format(sansEmpNum, row)
         temprows = ActiveRow(ws[formEmail].value, ws[formFName].value, ws[formLName].value, ws[formEmpNum].value)
         #Adding the cell reference.value to list
         sansRows.append(temprows)
-    print("Loaded data from Report1548267424539.xlsx\n")
+    print("Loaded data from " + sans + "\n")
     return sansRows
 
 ##ActiveEE Functions##
@@ -74,14 +86,14 @@ def loadActive():
     activeRows = []
     print("Loading data from " + active)
     for row in range(2,ws.max_row+1):
-        formEmail = "{}{}".format("D", row)
-        formFName = "{}{}".format("A", row)
-        formLName = "{}{}".format("B", row)
-        formEmpNum = "{}{}".format("C", row)
+        formEmail = "{}{}".format(activeEmail, row)
+        formFName = "{}{}".format(activeFName, row)
+        formLName = "{}{}".format(activeLName, row)
+        formEmpNum = "{}{}".format(activeEmpNum, row)
         temprows = ActiveRow(ws[formEmail].value, ws[formFName].value, ws[formLName].value, ws[formEmpNum].value)
         #Adding the cell reference.value to list
         activeRows.append(temprows)
-    print("Loaded emails from activeEE.xlsx\n")
+    print("Loaded emails from " + active + "\n")
     return(activeRows)
 
 ##Data Functions
@@ -111,7 +123,7 @@ def findInactiveEmails():
             listInactive.append(listSANS[i])
 
     print("Finished searching\n")
-    print(str(len(listInactive)))
+    print("Number of inactive users found: " + str(len(listInactive)) + "\n")
     return(listInactive)
 
 def findNewEmails():
@@ -135,7 +147,7 @@ def findNewEmails():
             listNew.append(listActive[i])
 
     print("Finished searching\n")
-    print(str(len(listNew)))
+    print("Number of new users found: " + str(len(listNew)) + "\n")
     return(listNew)
 
 def exportData():
@@ -145,11 +157,11 @@ def exportData():
     i = 2
     print("Attempting to open output file")
     try:
-        wb = load_workbook("Employees.xlsx")
+        wb = load_workbook(report)
         ws = wb.active
         print("Output file loaded succesfully\n")
     except FileNotFoundError:
-        print("\nERROR: Employees.xlsx not found")
+        print("\nERROR: " + report + " not found")
         print("ERROR: Please download the file from the SANS Administrator portal")
         print("ERROR: The file must be placed in the same directory as the program")
         exit()
@@ -174,11 +186,16 @@ def exportData():
         ws.cell(row=i, column = 2).value = newEmails[x].returnLName()
         ws.cell(row=i, column = 1).value = newEmails[x].returnEmpNum()
         i+=1
-    print("Write successful")
+    print("Write successful\n")
     print("Saving file...")
-    wb.save('updated.xlsx')
-    print("updated.xlsx saved")
+    try:
+        wb.save('updated.xlsx')
+        print("updated.xlsx saved\n")
+    except PermissionError:
+        print("ERROR: Permission denied; Please close updated.xlsx to run the script")
 
 def main():
     exportData()
+    print("Press enter to close this window")
+    input()
 main()
