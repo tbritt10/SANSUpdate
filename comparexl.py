@@ -4,8 +4,9 @@ import openpyxl
 
 #Global strings for file names
 sans = "Report1548267424539.xlsx"
-active = "ActiveEE.xlsx"
+active = "ActiveEEwdepart.xlsx"
 report = "Employees.xlsx"
+output = "report.xlsx"
 
 #Global variables for columns
 sansEmail = "E"
@@ -17,16 +18,24 @@ activeEmail = "D"
 activeFName = "A"
 activeLName = "B"
 activeEmpNum = "C"
+activeDepartment = "E"
+activeSupervisor = "F"
 
 class ActiveRow:
     """Row class represents 4 Cells from each row in an excel sheet"""
 
-    def __init__(self,email, fname, lname, empnum):
+    def __init__(self,email, fname, lname, empnum, department=None, supervisor=None):
         """Create a ActiveRow containing cells from the given row"""
         self.email = email
         self.fname = fname
         self.lname = lname
         self.empnum = str(empnum).zfill(9)
+        if department is None:
+            department = "General"
+        self.department = department
+        if supervisor is None:
+            supervisor = "N/A"
+        self.supervisor = supervisor
 
     def returnEmail(self):
         """Pull the email from a row, returns a string"""
@@ -41,8 +50,16 @@ class ActiveRow:
         return self.lname
 
     def returnEmpNum(self):
-        """Pulls the employee number from a row, returns an int"""
+        """Pulls the employee number from a row, returns a string"""
         return self.empnum
+
+    def returnDepartment(self):
+        """Pulls the department string from a row, or returns the default value; returns a string"""
+        return self.department
+
+    def returnSupervisor(self):
+        """Pulls the supervisor string from a row, or returns the default value; returns a string"""
+        return self.supervisor
 
     def toString(self):
         return "{}".format(self.email)
@@ -90,7 +107,9 @@ def loadActive():
         formFName = "{}{}".format(activeFName, row)
         formLName = "{}{}".format(activeLName, row)
         formEmpNum = "{}{}".format(activeEmpNum, row)
-        temprows = ActiveRow(ws[formEmail].value, ws[formFName].value, ws[formLName].value, ws[formEmpNum].value)
+        formDepartment = "{}{}".format(activeDepartment, row)
+        formSupervisor = "{}{}".format(activeSupervisor, row)
+        temprows = ActiveRow(ws[formEmail].value, ws[formFName].value, ws[formLName].value, ws[formEmpNum].value, ws[formDepartment].value, ws[formSupervisor].value)
         #Adding the cell reference.value to list
         activeRows.append(temprows)
     print("Loaded emails from " + active + "\n")
@@ -185,12 +204,14 @@ def exportData():
         ws.cell(row=i, column = 3).value = newEmails[x].returnFName()
         ws.cell(row=i, column = 2).value = newEmails[x].returnLName()
         ws.cell(row=i, column = 1).value = newEmails[x].returnEmpNum()
+        ws.cell(row=i, column = 11).value = newEmails[x].returnDepartment()
+        ws.cell(row=i, column = 5).value = newEmails[x].returnSupervisor()
         i+=1
     print("Write successful\n")
     print("Saving file...")
     try:
-        wb.save('updated.xlsx')
-        print("updated.xlsx saved\n")
+        wb.save(output)
+        print(output + " saved\n")
     except PermissionError:
         print("ERROR: Permission denied; Please close updated.xlsx to run the script")
 
