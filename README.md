@@ -15,3 +15,4 @@ Remove 'fake' from the names of the excel files. (Excel doesn't allow me to have
 
 See documentation for openpyxl here: https://openpyxl.readthedocs.io/en/stable/index.html
 
+File names and column letters are declared as global variables to allow for easily changing.
