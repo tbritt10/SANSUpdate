@@ -163,26 +163,13 @@ def findIncomplete():
     #Compares incomplete list to inactive users, generates new list
     listInactive = findInactiveEmails()
     listIncomplete = loadAudit()
-    convertedInactive = []
-    convertedIncomplete = []
     resultList = []
-
-    #convert lists of objects into lists of emails for easy comparisons
-    for i in range(len(listInactive)):
-        convertedInactive.append(listInactive[i].returnEmail())
-
-    for i in range(len(listIncomplete)):
-        convertedIncomplete.append(listIncomplete[i].returnEmail())
-
-    #Compare converted lists and append to resultList on ValueError (i.e. no match found)
 
     for email in listIncomplete:
         if email not in listInactive:
             resultList.append(email)
 
     return resultList
-    #for i in range(len(resultList)):
-    #    print(resultList[i].returnEmail() + "\n")
 
 def exportAudit():
     auditList = findIncomplete()
@@ -264,16 +251,12 @@ def findInactiveEmails():
     print("Searching for inactive users\n")
     listSANS = loadSANS()
     listActive = loadActive()
-    convertedSANS = []
-    convertedActive = []
     listInactive = []
 
     for email in listSANS:
         if email not in listActive:
             listInactive.append(email)
 
-    #Find inactive users
-    #Convert lists of objects to list of emails
     listInactive = [value for value in listSANS if value not in listActive]
     print("Finished searching\n")
     print("Number of inactive users found: " + str(len(listInactive)) + "\n")
@@ -283,8 +266,6 @@ def findNewEmails():
     print("Searching for new users\n")
     listSANS = loadSANS()
     listActive = loadActive()
-    convertedSANS = []
-    convertedActive = []
     listNew = []
 
     for email in listActive:
@@ -342,7 +323,7 @@ def exportData():
         print("ERROR: Permission denied; Please close " + output + " to run the script")
 
 def main():
-    #exportData()
+    exportData()
     exportAudit()
     print("Press enter to close this window")
     input()
