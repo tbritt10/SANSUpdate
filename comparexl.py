@@ -8,6 +8,9 @@ active = "ActiveEEwdepart.xlsx"
 report = "Employees.xlsx"
 output = "report.xlsx"
 
+audit = "CurriculumAuditReport.xlsx"
+auditReport = "ActiveNotComplete.xlsx"
+
 #Global variables for columns
 sansEmail = "E"
 sansFName = "C"
@@ -20,6 +23,54 @@ activeLName = "B"
 activeEmpNum = "C"
 activeDepartment = "E"
 activeSupervisor = "F"
+
+
+#The audit file is special in that it has merged cells, so the first cell in the merged cell range should return the data
+auditCurriculum = "A"
+auditEmpNum = "D"
+auditName = "F"
+auditEmail = "I"
+auditStatus = "M"
+
+class IncompleteRow:
+    """Row class that represents rows from the incomplete training report"""
+
+    def __init__(self, curriculum, empNum, name, email, status):
+        """Create an incomplete row containing the data from given cells"""
+        self.curriculum = curriculum
+        self.empNum = empNum
+        self.name = name
+        self.email = email
+        self.status = status
+
+    def __eq__(self, other):
+        """Overrides the default == (equals) behavior, returns a boolean value"""
+        return self.email == other.email
+
+    def __ne__(self, other):
+        """Overrides the default != (not equals) behavior, returns a boolean value"""
+        return self.email != other.email
+
+    def returnCurriculum(self):
+        """Return the curriculum from an object, returns a string"""
+        return self.curriculum
+
+    def returnEmpNum(self):
+        """Returns the employee number from an object, returns a string"""
+        return self.empNum
+
+    def returnName(self):
+        """Returns the name from an object, returns a sting"""
+        return self.name
+
+    def returnEmail(self):
+        """Returns an email from an object, returns a sting"""
+        return self.email
+
+    def returnStatus(self):
+        """Returns a status from an object, returns a sting"""
+        return self.status
+
 
 class ActiveRow:
     """Row class represents 4 Cells from each row in an excel sheet"""
@@ -36,6 +87,14 @@ class ActiveRow:
         if supervisor is None:
             supervisor = "N/A"
         self.supervisor = supervisor
+
+    def __eq__(self, other):
+        """Overrides the defualt == (equals) behavior, returns a boolean value"""
+        return self.email == other.email
+
+    def __ne__(self, other):
+        """Overrides the default != (not equal) behavior, returns a boolean value"""
+        return self.email != other.email
 
     def returnEmail(self):
         """Pull the email from a row, returns a string"""
@@ -73,6 +132,88 @@ class ActiveRow:
             return True
         else:
             return False
+
+##InactiveRow functions##
+def loadAudit():
+    #Load workbook and active worksheet
+    wb = load_workbook(audit)
+    ws = wb.active
+    #Create list to store IncompleteRow objects
+    auditRows = []
+    print("Loading data from " + audit)
+    for row in range(4, ws.max_row+1):
+        formCurriculum = "{}{}".format(auditCurriculum, row)
+        formEmpNum = "{}{}".format(auditEmpNum, row)
+        formName = "{}{}".format(auditName, row)
+        formEmail = "{}{}".format(auditEmail, row)
+        formStatus = "{}{}".format(auditStatus, row)
+        temprows = IncompleteRow(ws[formCurriculum].value, ws[formEmpNum].value, ws[formName].value, ws[formEmail].value, ws[formStatus].value)
+        auditRows.append(temprows)
+    print("Loaded data from " + audit)
+    count = 0
+    for i in range(len(auditRows)):
+        if auditRows[i].returnStatus() == "Incomplete":
+            count += 1
+        else:
+            continue
+    print(str(count))
+    return auditRows
+
+def findIncomplete():
+    #Compares incomplete list to inactive users, generates new list
+    listInactive = findInactiveEmails()
+    listIncomplete = loadAudit()
+    convertedInactive = []
+    convertedIncomplete = []
+    resultList = []
+
+    #convert lists of objects into lists of emails for easy comparisons
+    for i in range(len(listInactive)):
+        convertedInactive.append(listInactive[i].returnEmail())
+
+    for i in range(len(listIncomplete)):
+        convertedIncomplete.append(listIncomplete[i].returnEmail())
+
+    #Compare converted lists and append to resultList on ValueError (i.e. no match found)
+
+    for email in listIncomplete:
+        if email not in listInactive:
+            resultList.append(email)
+
+    return resultList
+    #for i in range(len(resultList)):
+    #    print(resultList[i].returnEmail() + "\n")
+
+def exportAudit():
+    auditList = findIncomplete()
+
+    #Create new blank workbook
+    wb = Workbook()
+    ws = wb.active
+
+    i = 1
+
+    print("Attempting to write users to file")
+    for x in range(len(auditList)):
+        if auditList[x].returnStatus() == "Incomplete":
+            ws.cell(row=i, column=1).value = auditList[x].returnCurriculum()
+            ws.cell(row=i, column=3).value = auditList[x].returnEmpNum()
+            ws.cell(row=i, column=5).value = auditList[x].returnName()
+            ws.cell(row=i, column=7).value = auditList[x].returnEmail()
+            ws.cell(row=i, column=9).value = auditList[x].returnStatus()
+            i += 1
+        else:
+            continue
+    print("Write successful\n")
+    print("Attempting to save file as " + auditReport)
+    try:
+        wb.save(auditReport)
+        print(auditReport + " saved\n")
+    except PermissionError:
+        print("ERROR: Permission denied; Please close " + auditReport + " to run the script")
+        exit()
+
+
 
 ##SANS Functions##
 def loadSANS():
@@ -127,20 +268,13 @@ def findInactiveEmails():
     convertedActive = []
     listInactive = []
 
+    for email in listSANS:
+        if email not in listActive:
+            listInactive.append(email)
+
     #Find inactive users
     #Convert lists of objects to list of emails
-    for i in range(len(listSANS)):
-        convertedSANS.append(listSANS[i].returnEmail())
-
-    for i in range(len(listActive)):
-        convertedActive.append(listActive[i].returnEmail())
-
-    for i in range(len(convertedSANS)):
-        try:
-            convertedActive.index(convertedSANS[i])
-        except ValueError:
-            listInactive.append(listSANS[i])
-
+    listInactive = [value for value in listSANS if value not in listActive]
     print("Finished searching\n")
     print("Number of inactive users found: " + str(len(listInactive)) + "\n")
     return(listInactive)
@@ -153,17 +287,9 @@ def findNewEmails():
     convertedActive = []
     listNew = []
 
-    for i in range(len(listSANS)):
-        convertedSANS.append(listSANS[i].returnEmail())
-
-    for i in range(len(listActive)):
-        convertedActive.append(listActive[i].returnEmail())
-
-    for i in range(len(convertedActive)):
-        try:
-            convertedSANS.index(convertedActive[i])
-        except ValueError:
-            listNew.append(listActive[i])
+    for email in listActive:
+        if email not in listSANS:
+            listNew.append(email)
 
     print("Finished searching\n")
     print("Number of new users found: " + str(len(listNew)) + "\n")
@@ -178,7 +304,7 @@ def exportData():
     try:
         wb = load_workbook(report)
         ws = wb.active
-        print("Output file loaded succesfully\n")
+        print("Output file loaded successfully\n")
     except FileNotFoundError:
         print("\nERROR: " + report + " not found")
         print("ERROR: Please download the file from the SANS Administrator portal")
@@ -213,10 +339,11 @@ def exportData():
         wb.save(output)
         print(output + " saved\n")
     except PermissionError:
-        print("ERROR: Permission denied; Please close updated.xlsx to run the script")
+        print("ERROR: Permission denied; Please close " + output + " to run the script")
 
 def main():
-    exportData()
+    #exportData()
+    exportAudit()
     print("Press enter to close this window")
     input()
 main()
