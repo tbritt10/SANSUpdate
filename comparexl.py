@@ -31,17 +31,21 @@ auditEmpNum = "D"
 auditName = "F"
 auditEmail = "I"
 auditStatus = "M"
+auditSupervisor = "P"
 
 class IncompleteRow:
     """Row class that represents rows from the incomplete training report"""
 
-    def __init__(self, curriculum, empNum, name, email, status):
+    def __init__(self, curriculum, empNum, name, email, status, supervisor = None):
         """Create an incomplete row containing the data from given cells"""
         self.curriculum = curriculum
         self.empNum = empNum
         self.name = name
         self.email = email
         self.status = status
+        if supervisor is None or "  ":
+            supervisor = "N/A"
+        self.supervisor = supervisor
 
     def __eq__(self, other):
         """Overrides the default == (equals) behavior, returns a boolean value"""
@@ -70,6 +74,14 @@ class IncompleteRow:
     def returnStatus(self):
         """Returns a status from an object, returns a sting"""
         return self.status
+
+    def returnSupervisor(self):
+        """Returns a supervisor from an object, returns a string"""
+        return self.supervisor
+
+    def setSupervisor(self, sup):
+        """Sets a supervisor in an object, no return"""
+        self.supervisor = sup
 
 
 class ActiveRow:
@@ -147,7 +159,8 @@ def loadAudit():
         formName = "{}{}".format(auditName, row)
         formEmail = "{}{}".format(auditEmail, row)
         formStatus = "{}{}".format(auditStatus, row)
-        temprows = IncompleteRow(ws[formCurriculum].value, ws[formEmpNum].value, ws[formName].value, ws[formEmail].value, ws[formStatus].value)
+        formSupervisor = "{}{}".format(auditSupervisor, row)
+        temprows = IncompleteRow(ws[formCurriculum].value, ws[formEmpNum].value, ws[formName].value, ws[formEmail].value, ws[formStatus].value, ws[formSupervisor].value)
         auditRows.append(temprows)
     print("Loaded data from " + audit)
     count = 0
@@ -163,11 +176,20 @@ def findIncomplete():
     #Compares incomplete list to inactive users, generates new list
     listInactive = findInactiveEmails()
     listIncomplete = loadAudit()
+    listActive = loadActive()
     resultList = []
 
     for email in listIncomplete:
         if email not in listInactive:
             resultList.append(email)
+
+    #Use activeEE to find supervisors and add them to incomplete report
+    for i in range(len(listActive)):
+        try:
+            j = resultList.index(listActive[i])
+            resultList[j].setSupervisor(listActive[i].returnSupervisor())
+        except ValueError:
+            continue
 
     return resultList
 
@@ -188,6 +210,7 @@ def exportAudit():
             ws.cell(row=i, column=5).value = auditList[x].returnName()
             ws.cell(row=i, column=7).value = auditList[x].returnEmail()
             ws.cell(row=i, column=9).value = auditList[x].returnStatus()
+            ws.cell(row=i, column=11).value = auditList[x].returnSupervisor()
             i += 1
         else:
             continue
@@ -323,7 +346,7 @@ def exportData():
         print("ERROR: Permission denied; Please close " + output + " to run the script")
 
 def main():
-    exportData()
+    #exportData()
     exportAudit()
     print("Press enter to close this window")
     input()
