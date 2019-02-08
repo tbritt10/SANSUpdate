@@ -2,6 +2,10 @@ from openpyxl import load_workbook
 from openpyxl import Workbook
 import openpyxl
 
+#Global options
+enableActiveReport = True
+enableIncompleteReport = True
+
 #Global strings for file names
 sans = "Report1548267424539.xlsx"
 active = "ActiveEEwdepart.xlsx"
@@ -346,8 +350,10 @@ def exportData():
         print("ERROR: Permission denied; Please close " + output + " to run the script")
 
 def main():
-    #exportData()
-    exportAudit()
+    if enableActiveReport is True:
+        exportData()
+    if enableIncompleteReport is True:
+        exportAudit()
     print("Press enter to close this window")
     input()
 main()
