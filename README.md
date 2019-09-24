@@ -29,9 +29,9 @@ This class is used to import the data for the report of employees who haven't co
 Class ActiveRow:
 This class is used to create objects from the current employee report for comparisons against the SANS report. This class overrides == and != behavior to compare self.email rather than the entire object. This is to allow for comparisons between the different classes. This class features the compareRow() method that compares between different "row" objects (i.e. ActiveRow == IncompleteRow). 
 
-For each files the program features a respective load function that uses the global column letter variables to choose where to pull data. Each has output to show the progress of loading files. 
+For each file the program features a respective load function that uses the global column letter variables to choose where to pull data. Each has output to show the progress of loading files. 
 
-Each of the respective files has a comparison function to do the job of finding inactive employees, new employees, and finding incomplete employees; as well as an export function to output these to a new excel files report.
+Each of the respective files has a comparison function to do the job of finding inactive employees, new employees, and incomplete employees; as well as an export function to output these to a new excel files report.
 
 The dataOutput() function has exception catches for FileNotFound errors which can occur if the user has a report open. The error output reflects solutions to the issues I encountered during testing. 
 
