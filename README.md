@@ -23,10 +23,10 @@ See documentation for openpyxl here: https://openpyxl.readthedocs.io/en/stable/i
 
 --------------------------------------------------------------------------------------------------------------------------------
 
-Class IncompleteRow
+Class IncompleteRow:
 This class is used to import the data for the report of employees who haven't completed training and for data that respresents a snapshot of the current users with licenses in SANS. Data is already present in the SANS report file, but users who are inactive must be stripped, and the supervisor must be pulled from another file and added. This class overrides == and != behavior to compare self.email rather than the entire object. This is to allow for comparisons between the different classes.
 
-Class ActiveRow
+Class ActiveRow:
 This class is used to create objects from the current employee report for comparisons against the SANS report. This class overrides == and != behavior to compare self.email rather than the entire object. This is to allow for comparisons between the different classes. This class features the compareRow() method that compares between different "row" objects (i.e. ActiveRow == IncompleteRow). 
 
 For each files the program features a respective load function that uses the global column letter variables to choose where to pull data. Each has output to show the progress of loading files. 
