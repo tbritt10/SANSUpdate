@@ -8,7 +8,7 @@
 
 > A second use case was eventually added just to generate a report of users who have not completed training with all inactive users stripped from the file. This also adds the supervisor names for each user to the report since they were not present in the original files used for the comparison.
 
-#####In order to do a demo of the script:
+##### In order to do a demo of the script:
 
 * Must have python version 3 or greater
 
